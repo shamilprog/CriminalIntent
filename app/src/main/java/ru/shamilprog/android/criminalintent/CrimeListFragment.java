@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +55,7 @@ public class CrimeListFragment extends Fragment {
         private Crime mCrime;
         private TextView mTitleTextView;
         private TextView mDateTextView;
+        private Button mPoliceButton;
 
         public DangerousCrimeHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_crime_serious, parent, false));
@@ -61,12 +63,21 @@ public class CrimeListFragment extends Fragment {
 
             mTitleTextView = (TextView) itemView.findViewById(R.id.crime_title);
             mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
+            mPoliceButton = (Button) itemView.findViewById(R.id.call_police_button);
         }
 
         public void bind(Crime crime) {
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
             mDateTextView.setText(mCrime.getDate().toString());
+            mPoliceButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity(),
+                            "Calling police...", Toast.LENGTH_SHORT)
+                            .show();
+                }
+            });
         }
 
         @Override
