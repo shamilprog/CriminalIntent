@@ -9,6 +9,7 @@ public class Crime {
     private String mTitle;
     private Date mDate;
     private boolean mSolved;
+    private boolean mRequiredPolice;
 
     public Crime() {
         mId = UUID.randomUUID();
@@ -27,6 +28,8 @@ public class Crime {
         mTitle = title;
     }
 
+
+
     public Date getDate() {
         return mDate;
     }
@@ -41,5 +44,13 @@ public class Crime {
 
     public void setSolved(boolean solved) {
         mSolved = solved;
+    }
+
+    public boolean isRequiredPolice() {
+        return mRequiredPolice;
+    }
+
+    public void setRequiredPolice(boolean requiredPolice) {
+        mRequiredPolice = requiredPolice;
     }
 }
