@@ -1,5 +1,6 @@
 package ru.shamilprog.android.criminalintent;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
@@ -41,6 +43,7 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mSuspectButton;
     private Button mReportButton;
+    private Button mCallSuspectButton;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -141,6 +144,18 @@ public class CrimeFragment extends Fragment {
             mSuspectButton.setText(mCrime.getSuspect());
         }
 
+        mCallSuspectButton = (Button) v.findViewById(R.id.call_suspect);
+        mCallSuspectButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mCrime.getTelephoneNumber() != null) {
+                    Intent i = new Intent(Intent.ACTION_DIAL);
+                    i.setData(Uri.parse("tel:"+mCrime.getTelephoneNumber()));
+                    startActivity(i);
+                }
+            }
+        });
+
         PackageManager packageManager = getActivity().getPackageManager();
         if (packageManager.resolveActivity(pickContact,
                 PackageManager.MATCH_DEFAULT_ONLY) == null) {
@@ -165,7 +180,8 @@ public class CrimeFragment extends Fragment {
             // Defining fields, which values should be
             // returned by a query
             String[] queryFields = new String[] {
-                    ContactsContract.Contacts.DISPLAY_NAME
+                    ContactsContract.Contacts.DISPLAY_NAME,
+                    ContactsContract.Contacts._ID
             };
             // Executing a query - contactUri stands here
             // like "where conditions"
@@ -181,6 +197,21 @@ public class CrimeFragment extends Fragment {
                 // Getting the first column of the data - suspect name.
                 c.moveToFirst();
                 String suspect = c.getString(0);
+
+                String id = c.getString(1);
+
+                Cursor phoneCursor = getActivity().getContentResolver()
+                        .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                new String[] {ContactsContract.CommonDataKinds.Phone.NUMBER},
+                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                                new String[] {id},
+                                null);
+
+                phoneCursor.moveToFirst();
+                String number = phoneCursor.getString(0);
+                mCrime.setTelephoneNumber(number);
+
+
                 mCrime.setSuspect(suspect);
                 mSuspectButton.setText(suspect);
             } finally {
