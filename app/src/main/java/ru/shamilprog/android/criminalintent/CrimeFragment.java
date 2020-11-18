@@ -39,18 +39,19 @@ public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
+    private static final String DIALOG_IMAGE = "DialogImage";
 
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_CONTACT = 1;
     private static final int REQUEST_PHOTO = 2;
+    private static final int REQUEST_ZOOMED_IMAGE = 3;
 
     private Crime mCrime;
     private File mPhotoFile;
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
-    private Button mSuspectButton;
-    private Button mReportButton;
+    private Button mSuspectButton;    private Button mReportButton;
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
 
@@ -163,6 +164,16 @@ public class CrimeFragment extends Fragment {
         mPhotoButton = (ImageButton) v.findViewById(R.id.crime_camera);
         mPhotoView = (ImageView) v.findViewById(R.id.crime_photo);
         updatePhotoView();
+        mPhotoView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager manager = getFragmentManager();
+                ShowImageFragment dialog = ShowImageFragment
+                        .newInstance(mPhotoFile);
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_ZOOMED_IMAGE);
+                dialog.show(manager, DIALOG_IMAGE);
+            }
+        });
 
         final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
