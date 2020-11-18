@@ -21,6 +21,7 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -51,9 +52,12 @@ public class CrimeFragment extends Fragment {
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
-    private Button mSuspectButton;    private Button mReportButton;
+    private Button mSuspectButton;
+    private Button mReportButton;
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
+    private int mPhotoWidth;
+    private int mPhotoHeight;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -163,7 +167,17 @@ public class CrimeFragment extends Fragment {
 
         mPhotoButton = (ImageButton) v.findViewById(R.id.crime_camera);
         mPhotoView = (ImageView) v.findViewById(R.id.crime_photo);
-        updatePhotoView();
+        ViewTreeObserver observer = mPhotoView.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mPhotoView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                mPhotoWidth = mPhotoView.getWidth();
+                mPhotoHeight = mPhotoView.getHeight();
+                updatePhotoView();
+            }
+        });
+
         mPhotoView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -286,7 +300,7 @@ public class CrimeFragment extends Fragment {
             mPhotoView.setImageDrawable(null);
         } else {
             Bitmap bitmap = PictureUtils.getScaledBitmap(
-                    mPhotoFile.getPath(), getActivity());
+                        mPhotoFile.getPath(), mPhotoWidth, mPhotoHeight);
             mPhotoView.setImageBitmap(bitmap);
         }
     }
