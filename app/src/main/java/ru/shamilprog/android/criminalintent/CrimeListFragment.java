@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,6 +38,33 @@ public class CrimeListFragment extends Fragment {
     public interface Callbacks {
         void onCrimeSelected(Crime crime);
     }
+
+    ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+            Crime mCrime = CrimeLab.get(getActivity())
+                    .getCrimes()
+                    .get(viewHolder.getAdapterPosition());
+            CrimeLab.get(getActivity())
+                    .removeCrime(CrimeLab.get(getActivity())
+                            .getCrime(mCrime.getId()));
+            updateUI();
+
+            Fragment fragment = getActivity().getSupportFragmentManager().findFragmentById(R.id.detail_fragment_container);
+
+            if (fragment != null) {
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .detach(fragment)
+                        .commit();
+            }
+        }
+    };
 
     @Override
     public void onAttach(Context context) {
@@ -117,6 +145,7 @@ public class CrimeListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
         mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager((new LinearLayoutManager(getActivity())));
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mCrimeRecyclerView);
 
         if (savedInstanceState != null) {
             mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
