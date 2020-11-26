@@ -32,9 +32,11 @@ import android.widget.ImageView;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
-import static android.widget.CompoundButton.*;
+import static android.widget.CompoundButton.OnCheckedChangeListener;
+import static android.widget.CompoundButton.OnClickListener;
 
 public class CrimeFragment extends Fragment {
 
@@ -272,7 +274,22 @@ public class CrimeFragment extends Fragment {
     }
 
     private void updateDate() {
-        mDateButton.setText(mCrime.getDate().toString());
+        Locale spainLocale = new Locale("es");
+
+        String lang = getResources()
+                .getConfiguration()
+                .locale
+                .getLanguage();
+
+        if (lang.equals("es")) {
+            java.text.DateFormat df = java.text.DateFormat
+                    .getDateInstance(java.text.DateFormat.LONG, spainLocale);
+            mDateButton.setText(df.format(mCrime.getDate()));
+        } else {
+            mDateButton.setText(mCrime.getDate().toString());
+        }
+
+
     }
 
     private String getCrimeReport() {
